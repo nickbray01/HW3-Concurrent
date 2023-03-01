@@ -1,3 +1,7 @@
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.Scanner;
 import java.io.*;
 import java.util.*;
@@ -25,9 +29,25 @@ public class BookClient {
         try {
             Scanner sc = new Scanner(new FileReader(commandFile));
 
+            DatagramSocket datasocket = new DatagramSocket();
+            DatagramPacket sPacket, rPacket;
+
             while (sc.hasNextLine()) {
                 String cmd = sc.nextLine();
                 String[] tokens = cmd.split(" ");
+
+                byte[] buffer = cmd.getBytes();
+                byte[] rbuffer = new byte[cmd.length()];
+                sPacket = new DatagramPacket(buffer,
+                        buffer.length,
+                        InetAddress.getByName(hostAddress),
+                        udpPort);
+                datasocket.send(sPacket);
+                rPacket = new DatagramPacket(rbuffer, rbuffer.length);
+                datasocket.receive(rPacket);
+                String retstring = new String(rPacket.getData(), 0,
+                        rPacket.getLength());
+                System.out.println("Received from Server:" + retstring);
 
                 if (tokens[0].equals("set-mode")) {
                     // TODO: set the mode of communication for sending commands to the server
@@ -49,7 +69,9 @@ public class BookClient {
                     System.out.println("ERROR: No such command");
                 }
             }
-        } catch (FileNotFoundException e) {
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

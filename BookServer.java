@@ -13,5 +13,9 @@ public class BookServer {
         // parse the inventory file
 
         // TODO: handle request from clients
+        Runnable udpServer = new UDPServer(udpPort);
+        Thread udpThread = new Thread(udpServer);
+        udpThread.run();
+
     }
 }
