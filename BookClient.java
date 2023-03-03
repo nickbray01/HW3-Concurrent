@@ -31,13 +31,17 @@ public class BookClient {
 
             DatagramSocket datasocket = new DatagramSocket();
             DatagramPacket sPacket, rPacket;
+            File output = new File("client_" + clientId + ".txt");
+            output.delete();
+        	output.createNewFile();
+        	FileWriter myWriter = new FileWriter("client_" + clientId + ".txt");
 
             while (sc.hasNextLine()) {
                 String cmd = sc.nextLine();
                 String[] tokens = cmd.split(" ");
 
                 byte[] buffer = cmd.getBytes();
-                byte[] rbuffer = new byte[cmd.length()];
+                byte[] rbuffer = new byte[1024];
                 sPacket = new DatagramPacket(buffer,
                         buffer.length,
                         InetAddress.getByName(hostAddress),
@@ -48,6 +52,9 @@ public class BookClient {
                 String retstring = new String(rPacket.getData(), 0,
                         rPacket.getLength());
                 System.out.println("Received from Server:" + retstring);
+                if(!tokens[0].equals("exit")) {
+                    myWriter.write(retstring + "\n");
+                }
 
                 if (tokens[0].equals("set-mode")) {
                     // TODO: set the mode of communication for sending commands to the server
@@ -65,6 +72,7 @@ public class BookClient {
                     // appropriate responses form the server
                 } else if (tokens[0].equals("exit")) {
                     // TODO: send appropriate command to the server
+                    myWriter.close();
                 } else {
                     System.out.println("ERROR: No such command");
                 }
