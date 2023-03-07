@@ -1,9 +1,7 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -47,6 +45,9 @@ public class tcpThread extends Thread{
                         retString = library.getLoans(tokens[1]);
                     } else if (tokens[0].equals("get-inventory")) {
                         retString = library.getInventory();
+                        String[] retArr = retString.split("\n");
+                        retString = "";
+//                        for (String retToken : )
                     } else if (tokens[0].equals("exit")) {
                         fileLock.lock();
                         File outFile = new File("inventory.txt");
