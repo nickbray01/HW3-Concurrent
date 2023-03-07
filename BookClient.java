@@ -1,7 +1,4 @@
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.Scanner;
 import java.io.*;
 import java.util.*;
@@ -12,6 +9,7 @@ public class BookClient {
         int tcpPort;
         int udpPort;
         int clientId;
+        String connectionType = "u";
 
         if (args.length != 2) {
             System.out.println("ERROR: Provide 2 arguments: command-file, clientId");
@@ -29,7 +27,10 @@ public class BookClient {
         try {
             Scanner sc = new Scanner(new FileReader(commandFile));
 
-            DatagramSocket datasocket = new DatagramSocket();
+            DatagramSocket udpSocket = new DatagramSocket();
+            Socket tcpSocket = null;
+            Scanner scanner = null;
+            PrintWriter pout = null;
             DatagramPacket sPacket, rPacket;
             File output = new File("client_" + clientId + ".txt");
             output.delete();
@@ -46,17 +47,39 @@ public class BookClient {
                         buffer.length,
                         InetAddress.getByName(hostAddress),
                         udpPort);
-                datasocket.send(sPacket);
-                rPacket = new DatagramPacket(rbuffer, rbuffer.length);
-                datasocket.receive(rPacket);
-                String retstring = new String(rPacket.getData(), 0,
-                        rPacket.getLength());
-                System.out.println("Received from Server:" + retstring);
-                if(!tokens[0].equals("exit")) {
-                    myWriter.write(retstring + "\n");
+                if(connectionType.equals("u")){
+                    udpSocket.send(sPacket);
+                    rPacket = new DatagramPacket(rbuffer, rbuffer.length);
+                    udpSocket.receive(rPacket);
+                    String retstring = new String(rPacket.getData(), 0,
+                            rPacket.getLength());
+                    System.out.println("Received from Server:" + retstring);
+                    if(!tokens[0].equals("exit")) {
+                        myWriter.write(retstring + "\n");
+                    }
+                }
+                else{
+                    // send tcp message
+
+                    pout.println(cmd);
+                    pout.flush();
+                    String retstring = scanner.nextLine();
+                    System.out.println("Received from Server:" + retstring);
+                    if(!tokens[0].equals("exit")) {
+                        myWriter.write(retstring + "\n");
+                    }
                 }
 
+
+
                 if (tokens[0].equals("set-mode")) {
+                    connectionType = tokens[1];
+                    if(connectionType.equals("t")){
+                        tcpSocket = new Socket(hostAddress, tcpPort);
+                        scanner = new Scanner(tcpSocket.getInputStream());
+                        pout = new PrintWriter(tcpSocket.getOutputStream());
+
+                    }
                     // TODO: set the mode of communication for sending commands to the server
                 } else if (tokens[0].equals("begin-loan")) {
                     // TODO: send appropriate command to the server and display the

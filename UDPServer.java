@@ -32,7 +32,12 @@ public class UDPServer implements Runnable {
             
         	
         	if (tokens[0].equals("set-mode")) {
-                // TODO: set the mode of communication for sending commands to the server
+                if(tokens[1].equals("t")){
+                    retString = "The communication mode is set to TCP";
+                }
+                else{
+                    retString = "The communication mode is set to UDP";
+                }
             } else if (tokens[0].equals("begin-loan")) {
             	String bookname = tokens[2];
             	for(int i = 3; i<tokens.length; i++) {
@@ -40,19 +45,12 @@ public class UDPServer implements Runnable {
             	}
                 retString = library.checkoutBook(bookname, tokens[1]);
             } else if (tokens[0].equals("end-loan")) {
-                // TODO: send appropriate command to the server and display the
-                // appropriate responses form the server
                 retString = library.endLoan(Integer.valueOf(tokens[1]));
             } else if (tokens[0].equals("get-loans")) {
-                // TODO: send appropriate command to the server and display the
-                // appropriate responses form the server
                 retString = library.getLoans(tokens[1]);
             } else if (tokens[0].equals("get-inventory")) {
-                // TODO: send appropriate command to the server and display the
-                // appropriate responses form the server
             	retString = library.getInventory();
             } else if (tokens[0].equals("exit")) {
-                // TODO: send appropriate command to the server
             	fileLock.lock();
                 File output = new File("inventory.txt");
                 output.delete();
