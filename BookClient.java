@@ -10,6 +10,7 @@ public class BookClient {
         int udpPort;
         int clientId;
         String connectionType = "u";
+        boolean tcpOpen = false;
 
         if (args.length != 2) {
             System.out.println("ERROR: Provide 2 arguments: command-file, clientId");
@@ -63,7 +64,20 @@ public class BookClient {
 
                     pout.println(cmd);
                     pout.flush();
-                    String retstring = scanner.nextLine();
+                    String retstring = "";
+                    if(tokens[0].equals("get-inventory")){
+                        String inventoryString;
+                        while(scanner.hasNextLine()){
+                            inventoryString = scanner.nextLine();
+                            System.out.println("is" + inventoryString);
+                            retstring += inventoryString;
+                            retstring += "\n";
+                        }
+                        System.out.println("escaped!");
+                    }
+                    else{
+                        retstring = scanner.nextLine();
+                    }
                     System.out.println("Received from Server:" + retstring);
                     if(!tokens[0].equals("exit")) {
                         myWriter.write(retstring + "\n");
@@ -75,10 +89,12 @@ public class BookClient {
                 if (tokens[0].equals("set-mode")) {
                     connectionType = tokens[1];
                     if(connectionType.equals("t")){
-                        tcpSocket = new Socket(hostAddress, tcpPort);
-                        scanner = new Scanner(tcpSocket.getInputStream());
-                        pout = new PrintWriter(tcpSocket.getOutputStream());
-
+                        if(!tcpOpen){
+                            tcpSocket = new Socket(hostAddress, tcpPort);
+                            scanner = new Scanner(tcpSocket.getInputStream());
+                            pout = new PrintWriter(tcpSocket.getOutputStream());
+                            tcpOpen = true;
+                        }
                     }
                     // TODO: set the mode of communication for sending commands to the server
                 } else if (tokens[0].equals("begin-loan")) {
@@ -96,6 +112,9 @@ public class BookClient {
                 } else if (tokens[0].equals("exit")) {
                     // TODO: send appropriate command to the server
                     myWriter.close();
+                    if(tcpSocket != null){
+
+                    }
                 } else {
                     System.out.println("ERROR: No such command");
                 }
