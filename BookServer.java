@@ -38,15 +38,15 @@ public class BookServer {
 	            books.add(book);
 	        }
 		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
         
         Library library = new Library(inventory, books);
-        // TODO: handle request from clients
         
         int len = 1024;
         ReentrantLock fileLock = new ReentrantLock();
+        Thread tcpServer = new Thread(new TCPServer(tcpPort, library, fileLock));
+        tcpServer.start();
         DatagramPacket datapacket, returnpacket;
         try {
             DatagramSocket datasocket = new DatagramSocket(udpPort);
@@ -56,7 +56,7 @@ public class BookServer {
                 datasocket.receive(datapacket);
                 
                 Thread udpThread = new Thread(new UDPServer(datapacket, datasocket, library, fileLock));
-                udpThread.run();
+                udpThread.start();
                 /*
                 returnpacket = new DatagramPacket(
                         datapacket.getData(),
