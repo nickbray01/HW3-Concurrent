@@ -64,19 +64,14 @@ public class BookClient {
 
                     pout.println(cmd);
                     pout.flush();
-                    String retstring = "";
+                    String retstring = scanner.nextLine();
                     if(tokens[0].equals("get-inventory")){
-                        String inventoryString;
-                        while(scanner.hasNextLine()){
-                            inventoryString = scanner.nextLine();
-                            System.out.println("is" + inventoryString);
-                            retstring += inventoryString;
+                        String[] retArr = retstring.split("TCPIS");
+                        retstring = "";
+                        for(String retToken : retArr){
+                            retstring += retToken;
                             retstring += "\n";
                         }
-                        System.out.println("escaped!");
-                    }
-                    else{
-                        retstring = scanner.nextLine();
                     }
                     System.out.println("Received from Server:" + retstring);
                     if(!tokens[0].equals("exit")) {

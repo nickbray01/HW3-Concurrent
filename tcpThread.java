@@ -24,6 +24,7 @@ public class tcpThread extends Thread{
                     String cmd = input.nextLine();
                     String[] tokens = cmd.split(" ");
                     String retString = "";
+                    String oneLineEncodeString = "";
 
 
                     if (tokens[0].equals("set-mode")) {
@@ -45,9 +46,12 @@ public class tcpThread extends Thread{
                         retString = library.getLoans(tokens[1]);
                     } else if (tokens[0].equals("get-inventory")) {
                         retString = library.getInventory();
+                        oneLineEncodeString = "";
                         String[] retArr = retString.split("\n");
-                        retString = "";
-//                        for (String retToken : )
+                        for (String retToken : retArr){
+                            oneLineEncodeString += retToken;
+                            oneLineEncodeString += "TCPIS";
+                        }
                     } else if (tokens[0].equals("exit")) {
                         fileLock.lock();
                         File outFile = new File("inventory.txt");
@@ -64,7 +68,12 @@ public class tcpThread extends Thread{
                     System.out.println(cmd);
                     System.out.println(retString);
 
-                    output.println(retString);
+                    if(tokens[0].equals("get-inventory")){
+                        output.println(oneLineEncodeString);
+                    }
+                    else{
+                        output.println(retString);
+                    }
                 }
 
 
