@@ -107,8 +107,9 @@ public class BookClient {
                 } else if (tokens[0].equals("exit")) {
                     // TODO: send appropriate command to the server
                     myWriter.close();
-                    if(tcpSocket != null){
-
+                    if(tcpSocket != null && connectionType.equals("u")){
+                        pout.println("end-from-udp");
+                        pout.flush();
                     }
                 } else {
                     System.out.println("ERROR: No such command");

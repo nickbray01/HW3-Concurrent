@@ -9,6 +9,7 @@ public class tcpThread extends Thread{
     Socket s;
     Library library;
     ReentrantLock fileLock;
+    boolean ended = false;
 
     public tcpThread(Socket s, Library lib, ReentrantLock lock){
         this.s = s;
@@ -17,7 +18,7 @@ public class tcpThread extends Thread{
     }
         public void start(){
             try {
-                while(true){
+                while(!ended){
                     Scanner input = new Scanner(s.getInputStream());
                     PrintStream output = new PrintStream(s.getOutputStream());
 
@@ -61,7 +62,11 @@ public class tcpThread extends Thread{
                         myWriter.write(library.getInventory());
                         myWriter.close();
                         fileLock.unlock();
-                        break;
+                        ended = true;
+                    }
+                    else if (tokens[0].equals("end-from-udp")){
+                        retString = "end tcp connection";
+                        ended = true;
                     } else {
                         System.out.println("ERROR: No such command");
                     }
@@ -70,6 +75,9 @@ public class tcpThread extends Thread{
 
                     if(tokens[0].equals("get-inventory")){
                         output.println(oneLineEncodeString);
+                    }
+                    else if(tokens[0].equals("end-from-udp")){
+
                     }
                     else{
                         output.println(retString);
